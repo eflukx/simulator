@@ -24,6 +24,9 @@ pub enum BinaryColorTheme {
 
     /// An on/off OLED-like display with a dark blue background and light blue pixels
     OledBlue,
+
+    /// Custom binary color theme/mapping
+    Custom(Rgb888, Rgb888),
 }
 
 fn map_color(color: Rgb888, color_off: Rgb888, color_on: Rgb888) -> Rgb888 {
@@ -34,10 +37,16 @@ fn map_color(color: Rgb888, color_off: Rgb888, color_on: Rgb888) -> Rgb888 {
 }
 
 impl BinaryColorTheme {
+    /// Create a new custom binary color theme/mapping
+    pub const fn custom(color_off: Rgb888, color_on: Rgb888) -> BinaryColorTheme {
+        BinaryColorTheme::Custom(color_off, color_on)
+    }
+
     /// Gets the theme's pixel color for a given pixel state.
     pub(crate) fn convert(self, color: Rgb888) -> Rgb888 {
         match self {
             BinaryColorTheme::Default => color,
+            BinaryColorTheme::Custom(color_off, color_on) => map_color(color, color_off, color_on),
             BinaryColorTheme::Inverted => {
                 Rgb888::new(255 - color.r(), 255 - color.g(), 255 - color.b())
             }
